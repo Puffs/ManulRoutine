@@ -1,0 +1,60 @@
+from django.shortcuts import render
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import TemplateView
+from django_filters import FilterSet
+from django_filters import filters
+from rest_framework import viewsets,permissions
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import OrderingFilter
+from rest_framework.decorators import action
+import os
+from django.conf import settings
+from boardapp.serializers import BoardSerializer, ColumnSerializer
+from boardapp.models import Board, Column
+from django.http import JsonResponse
+from rest_framework.permissions import BasePermission,IsAuthenticated,DjangoModelPermissions
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+
+class IndexView(LoginRequiredMixin,TemplateView):
+    """ Ссылка на frontend шаблон.
+    """
+    template_name=  "index.html"
+
+
+class BoardSetFilter(FilterSet):
+    class Meta:
+        model = Board
+        fields= '__all__'
+
+class BoardViewSet(viewsets.ModelViewSet):
+    queryset = Board.objects.filter()
+    model = Board
+    serializer_class = BoardSerializer
+    filter_backends = (DjangoFilterBackend,OrderingFilter)
+    filterset_class  = BoardSetFilter
+    permission_classes = [IsAuthenticated,DjangoModelPermissions]
+
+
+class ColumnSetFilter(FilterSet):
+    class Meta:
+        model = Column
+        fields= '__all__'
+
+class ColumnViewSet(viewsets.ModelViewSet):
+    queryset = Column.objects.filter()
+    model = Column
+    serializer_class = ColumnSerializer
+    filter_backends = (DjangoFilterBackend,OrderingFilter)
+    filterset_class  = ColumnSetFilter
+    permission_classes = [IsAuthenticated,DjangoModelPermissions]
+    
+
+@receiver(post_save, sender=Board)
+def my_model_post_save(sender, instance, created, **kwargs):
+    if created:
+        Column.objects.create(name="ToDo", board=instance)
+        Column.objects.create(name="In progress", board=instance)
+        Column.objects.create(name="Done", board=instance)
+    
