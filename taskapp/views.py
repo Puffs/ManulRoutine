@@ -20,9 +20,19 @@ class TaskSetFilter(FilterSet):
         fields= '__all__'
 
 class TaskViewSet(viewsets.ModelViewSet):
-    queryset = Task.objects.filter()
+    queryset = Task.objects.filter().order_by("order")
     model = Task
     serializer_class = TaskSerializer
     filter_backends = (DjangoFilterBackend,OrderingFilter)
     filterset_class  = TaskSetFilter
     permission_classes = [IsAuthenticated,DjangoModelPermissions]
+
+    @action(detail=False, methods=['post'])
+    def set_task_order(self, request):
+        task_list = request.data
+        for task in task_list:
+            task_obj = Task.objects.get(id=task["id"])
+            task_obj.order = task["order"]
+            task_obj.save()
+        
+        return JsonResponse({}, safe=False)

@@ -15,7 +15,8 @@ from django.http import JsonResponse
 from rest_framework.permissions import BasePermission,IsAuthenticated,DjangoModelPermissions
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-
+from django.db.models import Prefetch
+from taskapp.models import Task
 
 class IndexView(LoginRequiredMixin,TemplateView):
     """ Ссылка на frontend шаблон.
@@ -43,18 +44,27 @@ class ColumnSetFilter(FilterSet):
         fields= '__all__'
 
 class ColumnViewSet(viewsets.ModelViewSet):
-    queryset = Column.objects.filter()
+    queryset = Column.objects.filter().order_by('order').prefetch_related(Prefetch('task_set', queryset=Task.objects.order_by('order')))
     model = Column
     serializer_class = ColumnSerializer
     filter_backends = (DjangoFilterBackend,OrderingFilter)
     filterset_class  = ColumnSetFilter
     permission_classes = [IsAuthenticated,DjangoModelPermissions]
     
-
+    @action(detail=False, methods=['post'])
+    def set_column_order(self, request):
+        order_list = request.data
+        for col in order_list:
+            col_obj = Column.objects.get(id=col["id"])
+            col_obj.order = col["order"]
+            col_obj.save()
+        
+        return JsonResponse({}, safe=False)
+    
 @receiver(post_save, sender=Board)
 def my_model_post_save(sender, instance, created, **kwargs):
     if created:
-        Column.objects.create(name="ToDo", board=instance)
-        Column.objects.create(name="In progress", board=instance)
-        Column.objects.create(name="Done", board=instance)
+        Column.objects.create(name="ToDo", order=0, board=instance)
+        Column.objects.create(name="In progress", order=1, board=instance)
+        Column.objects.create(name="Done", order=2, board=instance)
     
