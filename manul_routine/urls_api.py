@@ -11,5 +11,6 @@ router = DefaultRouter()
 router.register(r'board', boardapp_view.BoardViewSet, basename='board')
 router.register(r'column', boardapp_view.ColumnViewSet, basename='column')
 router.register(r'task', taskapp_view.TaskViewSet, basename='task')
+router.register(r'comment', taskapp_view.CommentViewSet, basename='comment')
 
 urlpatterns =[path('api/', include(router.urls))]

@@ -22,7 +22,7 @@ class ColumnInlineSerializer(ModelSerializerId):
         fields = "__all__"
 
 class ColumnSerializer(serializers.ModelSerializer):
-    tasks = TaskInlineSerializer(many=True, source="task_set", required=False)
+    tasks = TaskInlineSerializer(many=True, source="task_set", read_only=True)
     class Meta:
         model = Column
         fields = "__all__"

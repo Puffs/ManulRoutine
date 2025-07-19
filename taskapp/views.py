@@ -7,8 +7,8 @@ from rest_framework.filters import OrderingFilter
 from rest_framework.decorators import action
 import os
 from django.conf import settings
-from taskapp.serializers import TaskSerializer
-from taskapp.models import Task
+from taskapp.serializers import TaskSerializer, CommentSerializer
+from taskapp.models import Task, Comment
 from django.http import JsonResponse
 from rest_framework.permissions import BasePermission,IsAuthenticated,DjangoModelPermissions
 
@@ -36,3 +36,16 @@ class TaskViewSet(viewsets.ModelViewSet):
             task_obj.save()
         
         return JsonResponse({}, safe=False)
+    
+class CommentSetFilter(FilterSet):
+    class Meta:
+        model = Comment
+        fields= '__all__'
+
+class CommentViewSet(viewsets.ModelViewSet):
+    queryset = Comment.objects.filter().order_by("date")
+    model = Comment
+    serializer_class = CommentSerializer
+    filter_backends = (DjangoFilterBackend,OrderingFilter)
+    filterset_class  = CommentSetFilter
+    permission_classes = [IsAuthenticated,DjangoModelPermissions]
