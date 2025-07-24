@@ -38,9 +38,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_filters',
     'rest_framework',
     'taskapp',
     'boardapp',
+    'userapp',
 ]
 
 MIDDLEWARE = [
@@ -72,6 +74,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'manul_routine.wsgi.application'
+AUTH_USER_MODEL = 'userapp.CustomUser'
 # ASGI_APPLICATION = 'manul_routine.asgi.application'
 
 # Database
