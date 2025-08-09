@@ -17,11 +17,12 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.db.models import Prefetch
 from taskapp.models import Task
+# from django.contrib.auth.decorators import login_required
+
 
 class IndexView(LoginRequiredMixin,TemplateView):
-    """ Ссылка на frontend шаблон.
-    """
     template_name=  "index.html"
+    login_url = "/accounts/login/"
 
 
 class BoardSetFilter(FilterSet):
