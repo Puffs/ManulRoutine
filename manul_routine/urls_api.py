@@ -6,7 +6,6 @@ import taskapp.views as taskapp_view
 import userapp.views as userapp_view
 
 
-router = DefaultRouter()
 
 router = DefaultRouter()
 router.register(r'board', boardapp_view.BoardViewSet, basename='board')
