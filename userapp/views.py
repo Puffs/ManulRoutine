@@ -20,6 +20,7 @@ class CustomUserSetFilter(FilterSet):
     class Meta:
         model = CustomUser
         fields= '__all__'
+        exclude = ['avatar']
 
 class CustomUserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.filter()
@@ -29,6 +30,24 @@ class CustomUserViewSet(viewsets.ModelViewSet):
     filterset_class  = CustomUserSetFilter
     permission_classes = [IsAuthenticated,DjangoModelPermissions]
 
+    @action(detail=False,methods=['get'])
+    def who_im(self,request):
+        user = request.user
+        return JsonResponse({
+            'id':user.id,
+            'is_superuser':user.is_superuser,
+            'username':user.username,
+            'first_name':user.first_name,
+            'last_name': user.last_name,
+            'email':user.email,
+            'is_staff':user.is_staff,
+            'is_active':user.is_active,
+            'is_staff':user.is_staff,
+            'date_joined':user.date_joined,
+            'location':user.location,
+            'birth_date':user.birth_date,
+            'avatar':user.avatar.url if user.avatar else None,      
+        })
 
 
 class UserRegistrationForm(forms.ModelForm):

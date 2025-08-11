@@ -1,0 +1,1 @@
+import{c as e,a as s,o}from"./index-BT2sSzTR.js";const c={class:"container"},l={__name:"MainPage",setup(t){return(n,a)=>(o(),e("div",c,a[0]||(a[0]=[s("div",{class:"row"},[s("div",{class:"col-3"},"panel"),s("div",{class:"col-9"},"2333333333")],-1)])))}};export{l as default};
