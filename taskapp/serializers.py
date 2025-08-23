@@ -53,3 +53,17 @@ class TaskSerializer(serializers.ModelSerializer):
         representation = super().to_representation(instance)
         representation['executor'] = CustomUserSerializer(instance.executor.all(), many=True).data
         return representation
+    
+    def to_internal_value(self, data):
+        if 'executor' in data:
+            executor_data = data['executor']
+        
+            if all(isinstance(item, dict) for item in executor_data):
+                executor_ids = [item['id'] for item in executor_data]
+                data['executor'] = executor_ids
+            elif all(isinstance(item, int) for item in executor_data):
+                pass
+            else:
+                raise serializers.ValidationError("executor must be a list of IDs or objects.")
+        
+        return super().to_internal_value(data)
