@@ -17,6 +17,8 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.db.models import Prefetch
 from taskapp.models import Task
+from django.core.files.base import ContentFile
+import base64
 # from django.contrib.auth.decorators import login_required
 
 
@@ -29,6 +31,7 @@ class BoardSetFilter(FilterSet):
     class Meta:
         model = Board
         fields= '__all__'
+        exclude=['background_image']
 
 class BoardViewSet(viewsets.ModelViewSet):
     queryset = Board.objects.filter()
@@ -38,7 +41,50 @@ class BoardViewSet(viewsets.ModelViewSet):
     filterset_class  = BoardSetFilter
     permission_classes = [IsAuthenticated,DjangoModelPermissions]
 
+    @action(detail=False, methods=['get'])
+    def get_user_tasks(self, request):
+        result_list = []
+        board_dict = {}
+        for task in Task.objects.filter(executor=request.user):
+            executor_list = [{"id": executor.id, "username": executor.username} for executor in task.executor.all()]
 
+            task_obj = {
+                "id":task.id,
+                "name":task.name,
+                "executor":executor_list,
+                "order":task.order,
+                "column_id":task.column.id,
+                "column_name":task.column.name,
+            }
+            if task.column.board.id not in board_dict:
+                board_dict[task.column.board.id] = {
+                    "id": task.column.board.id,
+                    "name": task.column.board.name,
+                    "task_set": [task_obj]
+                }
+            else:
+                board_dict[task.column.board.id]["task_set"].append(task_obj)
+
+        result_list = sorted(board_dict.values(), key=lambda x: x["id"])
+
+        return JsonResponse(result_list, safe=False)
+
+    @action(detail=True, methods=['post'])
+    def save_board_image(self, request, pk):
+        img = request.data.get('background_image')
+        board_obj = Board.objects.get(id=pk)
+
+        format, imgstr = img.split(';base64,')
+        ext = format.split('/')[-1]
+        
+       
+        image_data = base64.b64decode(imgstr)
+        file_name = f'background_{pk}.{ext}'
+        
+        board_obj.background_image.save(file_name, ContentFile(image_data), save=True)
+        
+        return JsonResponse(pk, safe=False)
+    
 class ColumnSetFilter(FilterSet):
     class Meta:
         model = Column

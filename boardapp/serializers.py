@@ -12,10 +12,14 @@ class BoardInlineSerializer(ModelSerializerId):
         fields = "__all__"
 
 class BoardSerializer(serializers.ModelSerializer):
+    background_image_url = serializers.SerializerMethodField()
     class Meta:
         model = Board
         fields = "__all__"
 
+    def get_background_image_url(self, obj):
+        return obj.background_image.url if obj.background_image else None
+    
 class ColumnInlineSerializer(ModelSerializerId):
     class Meta:
         model = Column
