@@ -15,6 +15,8 @@ from django import forms
 from django.shortcuts import render, redirect
 from django.core.exceptions import ValidationError
 from django.contrib.auth import login
+from django.core.files.base import ContentFile
+import base64
 
 class CustomUserSetFilter(FilterSet):
     class Meta:
@@ -48,6 +50,22 @@ class CustomUserViewSet(viewsets.ModelViewSet):
             'birth_date':user.birth_date,
             'avatar':user.avatar.url if user.avatar else None,      
         })
+    
+    @action(detail=True, methods=['post'])
+    def save_avatar_image(self, request, pk):
+        img = request.data.get('avatar_image')
+        user_obj = CustomUser.objects.get(id=pk)
+
+        format, imgstr = img.split(';base64,')
+        ext = format.split('/')[-1]
+        
+       
+        image_data = base64.b64decode(imgstr)
+        file_name = f'avatar_{pk}.{ext}'
+        
+        user_obj.avatar.save(file_name, ContentFile(image_data), save=True)
+        
+        return JsonResponse(pk, safe=False)
 
 
 class UserRegistrationForm(forms.ModelForm):

@@ -11,7 +11,8 @@ from taskapp.serializers import TaskSerializer, CommentSerializer
 from taskapp.models import Task, Comment
 from django.http import JsonResponse
 from rest_framework.permissions import BasePermission,IsAuthenticated,DjangoModelPermissions
-
+from django.core.files.base import ContentFile
+import base64
 
 
 class TaskSetFilter(FilterSet):
@@ -37,10 +38,29 @@ class TaskViewSet(viewsets.ModelViewSet):
         
         return JsonResponse({}, safe=False)
     
+    @action(detail=True, methods=['post'])
+    def save_input_img(self, request, pk):
+        user = request.user
+        img = request.data.get('file_img')
+        task_obj = Task.objects.get(id=pk)
+        Comment.objects.create(img_file=img, task=task_obj, author=user)
+        
+        return JsonResponse(pk, safe=False)
+    
+    @action(detail=True, methods=['post'])
+    def save_input_file(self, request, pk):
+        user = request.user
+        file_obj = request.data.get('file_input')
+        task_obj = Task.objects.get(id=pk)
+        Comment.objects.create(data=file_obj, task=task_obj, author=user)
+        
+        return JsonResponse(pk, safe=False)
+    
 class CommentSetFilter(FilterSet):
     class Meta:
         model = Comment
         fields= '__all__'
+        exclude=['img_file', 'data']
 
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.filter().order_by("date")

@@ -14,20 +14,33 @@ class CommentInlineSerializer(ModelSerializerId):
         read_only=True,
     )
     author = CustomUserSerializer(read_only=True)
+    img_file_url = serializers.SerializerMethodField()
+    data_url = serializers.SerializerMethodField()
     class Meta:
         model = Comment
         fields = "__all__"
 
+    def get_img_file_url(self, obj):
+        return obj.img_file.url if obj.img_file else None
+    def get_data_url(self, obj):
+        return obj.data.url if obj.data else None
+    
 class CommentSerializer(serializers.ModelSerializer):
     date= serializers.DateTimeField(
         format='%d.%m.%Y %H:%M',
         read_only=True,
     )
+    data_url = serializers.SerializerMethodField()
+    img_file_url = serializers.SerializerMethodField()
     class Meta:
         model = Comment
         fields = "__all__"
 
-        
+    def get_img_file_url(self, obj):
+        return obj.img_file.url if obj.img_file else None
+    def get_data_url(self, obj):
+        return obj.data.url if obj.data else None
+    
 class TaskInlineSerializer(ModelSerializerId):
     comment_set = CommentInlineSerializer(many=True, read_only=True)
     executor = CustomUserSerializer(many=True, read_only=True)
@@ -38,6 +51,7 @@ class TaskInlineSerializer(ModelSerializerId):
 class TaskSerializer(serializers.ModelSerializer):
     comment_set = CommentInlineSerializer(many=True, read_only=True)
     executor = serializers.PrimaryKeyRelatedField(queryset=CustomUser.objects.all(),many=True)
+    
     class Meta:
         model = Task
         fields = "__all__"
@@ -67,3 +81,4 @@ class TaskSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError("executor must be a list of IDs or objects.")
         
         return super().to_internal_value(data)
+    
