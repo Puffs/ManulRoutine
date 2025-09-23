@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from django.db import IntegrityError
 from rest_framework import status
 from taskapp.serializers import TaskInlineSerializer
+from userapp.serializers import CustomUserSerializer
 
 class BoardInlineSerializer(ModelSerializerId):
     class Meta:
@@ -17,8 +18,34 @@ class BoardSerializer(serializers.ModelSerializer):
         model = Board
         fields = "__all__"
 
+    # def update(self,instance,validated_data):
+    #     executor_set = validated_data.pop('executor', None)
+        
+    #     if executor_set is not None:
+    #         instance.executor.set(executor_set)
+    #     return super().update(instance,validated_data)
+
     def get_background_image_url(self, obj):
         return obj.background_image.url if obj.background_image else None
+    
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['user_list'] = CustomUserSerializer(instance.user_list.all(), many=True).data
+        return representation
+    
+    def to_internal_value(self, data):
+        if 'user_list' in data:
+            user_list_data = data['user_list']
+        
+            if all(isinstance(item, dict) for item in user_list_data):
+                executor_ids = [item['id'] for item in user_list_data]
+                data['user_list'] = executor_ids
+            elif all(isinstance(item, int) for item in user_list_data):
+                pass
+            else:
+                raise serializers.ValidationError("executor must be a list of IDs or objects.")
+        
+        return super().to_internal_value(data)
     
 class ColumnInlineSerializer(ModelSerializerId):
     class Meta:
