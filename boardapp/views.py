@@ -19,6 +19,7 @@ from django.db.models import Prefetch
 from taskapp.models import Task
 from django.core.files.base import ContentFile
 import base64
+from userapp.models import CustomUser
 # from django.contrib.auth.decorators import login_required
 
 
@@ -41,6 +42,25 @@ class BoardViewSet(viewsets.ModelViewSet):
     filterset_class  = BoardSetFilter
     permission_classes = [IsAuthenticated,DjangoModelPermissions]
 
+    @action(detail=True, methods=['post'])
+    def remove_user(self, request, pk):
+        board_obj = Board.objects.get(id=pk)
+        user_id = request.data.get("user_id")
+        user_obj = CustomUser.objects.get(id=user_id)
+        print("user_id: ", user_obj)
+        board_obj.user_list.remove(user_obj)
+
+        return JsonResponse(pk, safe=False)
+    
+    @action(detail=True, methods=['post'])
+    def add_user(self, request, pk):
+        board_obj = Board.objects.get(id=pk)
+        user_id = request.data.get("user_id")
+        user_obj = CustomUser.objects.get(id=user_id)
+        print("user_id: ", user_obj)
+        board_obj.user_list.add(user_obj)
+        return JsonResponse(pk, safe=False)
+    
     @action(detail=False, methods=['get'])
     def get_user_tasks(self, request):
         result_list = []
