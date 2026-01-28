@@ -2,17 +2,14 @@ from django.shortcuts import render
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import TemplateView
 from django_filters import FilterSet
-from django_filters import filters
-from rest_framework import viewsets,permissions
+from rest_framework import viewsets
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter
 from rest_framework.decorators import action
-import os
-from django.conf import settings
 from boardapp.serializers import BoardSerializer, ColumnSerializer
 from boardapp.models import Board, Column
 from django.http import JsonResponse
-from rest_framework.permissions import BasePermission,IsAuthenticated,DjangoModelPermissions
+from rest_framework.permissions import IsAuthenticated,DjangoModelPermissions
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.db.models import Prefetch
@@ -29,6 +26,7 @@ class IndexView(LoginRequiredMixin,TemplateView):
 
 
 class BoardSetFilter(FilterSet):
+    
     class Meta:
         model = Board
         fields= '__all__'
@@ -47,7 +45,6 @@ class BoardViewSet(viewsets.ModelViewSet):
         board_obj = Board.objects.get(id=pk)
         user_id = request.data.get("user_id")
         user_obj = CustomUser.objects.get(id=user_id)
-        print("user_id: ", user_obj)
         board_obj.user_list.remove(user_obj)
 
         return JsonResponse(pk, safe=False)
@@ -57,7 +54,6 @@ class BoardViewSet(viewsets.ModelViewSet):
         board_obj = Board.objects.get(id=pk)
         user_id = request.data.get("user_id")
         user_obj = CustomUser.objects.get(id=user_id)
-        print("user_id: ", user_obj)
         board_obj.user_list.add(user_obj)
         return JsonResponse(pk, safe=False)
     
@@ -97,7 +93,6 @@ class BoardViewSet(viewsets.ModelViewSet):
         format, imgstr = img.split(';base64,')
         ext = format.split('/')[-1]
         
-       
         image_data = base64.b64decode(imgstr)
         file_name = f'background_{pk}.{ext}'
         
@@ -106,6 +101,7 @@ class BoardViewSet(viewsets.ModelViewSet):
         return JsonResponse(pk, safe=False)
     
 class ColumnSetFilter(FilterSet):
+
     class Meta:
         model = Column
         fields= '__all__'

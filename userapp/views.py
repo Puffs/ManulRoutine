@@ -1,16 +1,14 @@
 from django.shortcuts import render
 from django_filters import FilterSet
 from django_filters import filters
-from rest_framework import viewsets,permissions
+from rest_framework import viewsets
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter
 from rest_framework.decorators import action
-import os
-from django.conf import settings
 from userapp.serializers import CustomUserSerializer
 from userapp.models import CustomUser
 from django.http import JsonResponse
-from rest_framework.permissions import BasePermission,IsAuthenticated,DjangoModelPermissions
+from rest_framework.permissions import IsAuthenticated,DjangoModelPermissions
 from django import forms
 from django.shortcuts import render, redirect
 from django.core.exceptions import ValidationError
@@ -19,6 +17,7 @@ from django.core.files.base import ContentFile
 import base64
 
 class CustomUserSetFilter(FilterSet):
+    
     class Meta:
         model = CustomUser
         fields= '__all__'

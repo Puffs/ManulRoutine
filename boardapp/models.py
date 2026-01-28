@@ -3,6 +3,7 @@ from userapp.models import CustomUser
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 
+
 def background_image_path(instance, filename):
     return 'board/' + str(instance.id) + '/background_image/' + str(filename)
 
@@ -22,4 +23,3 @@ class Column(models.Model):
 def add_user(sender, instance, created, **kwargs):
     if created:
         instance.user_list.set([instance.creator.id])
-   

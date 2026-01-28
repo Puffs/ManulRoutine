@@ -1,9 +1,6 @@
 from taskapp.models import Task, Comment
 from tools.serializers import ModelSerializerId
 from rest_framework import serializers
-from rest_framework.response import Response
-from django.db import IntegrityError
-from rest_framework import status
 from userapp.models import CustomUser
 from userapp.serializers import CustomUserSerializer
 
@@ -16,6 +13,7 @@ class CommentInlineSerializer(ModelSerializerId):
     author = CustomUserSerializer(read_only=True)
     img_file_url = serializers.SerializerMethodField()
     data_url = serializers.SerializerMethodField()
+
     class Meta:
         model = Comment
         fields = "__all__"
@@ -32,6 +30,7 @@ class CommentSerializer(serializers.ModelSerializer):
     )
     data_url = serializers.SerializerMethodField()
     img_file_url = serializers.SerializerMethodField()
+
     class Meta:
         model = Comment
         fields = "__all__"
@@ -44,6 +43,7 @@ class CommentSerializer(serializers.ModelSerializer):
 class TaskInlineSerializer(ModelSerializerId):
     comment_set = CommentInlineSerializer(many=True, read_only=True)
     executor = CustomUserSerializer(many=True, read_only=True)
+    
     class Meta:
         model = Task
         fields = "__all__"

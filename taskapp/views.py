@@ -1,21 +1,16 @@
-from django.shortcuts import render
 from django_filters import FilterSet
-from django_filters import filters
-from rest_framework import viewsets,permissions
+from rest_framework import viewsets
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter
 from rest_framework.decorators import action
-import os
-from django.conf import settings
 from taskapp.serializers import TaskSerializer, CommentSerializer
 from taskapp.models import Task, Comment
 from django.http import JsonResponse
-from rest_framework.permissions import BasePermission,IsAuthenticated,DjangoModelPermissions
-from django.core.files.base import ContentFile
-import base64
+from rest_framework.permissions import IsAuthenticated, DjangoModelPermissions
 
 
 class TaskSetFilter(FilterSet):
+
     class Meta:
         model = Task
         fields= '__all__'
@@ -57,6 +52,7 @@ class TaskViewSet(viewsets.ModelViewSet):
         return JsonResponse(pk, safe=False)
     
 class CommentSetFilter(FilterSet):
+    
     class Meta:
         model = Comment
         fields= '__all__'

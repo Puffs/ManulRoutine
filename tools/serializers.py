@@ -1,5 +1,7 @@
 from rest_framework import serializers
-from django.utils.datastructures import  MultiValueDict
+# from django.utils.datastructures import  MultiValueDict
+
+
 class ModelSerializerId(serializers.ModelSerializer):
     def to_internal_value(self, data):
         if data:
