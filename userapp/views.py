@@ -8,6 +8,7 @@ from rest_framework.decorators import action
 from userapp.serializers import CustomUserSerializer
 from userapp.models import CustomUser
 from django.http import JsonResponse
+from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated,DjangoModelPermissions
 from django import forms
 from django.shortcuts import render, redirect
@@ -15,6 +16,7 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth import login
 from django.core.files.base import ContentFile
 import base64
+
 
 class CustomUserSetFilter(FilterSet):
     
@@ -33,22 +35,9 @@ class CustomUserViewSet(viewsets.ModelViewSet):
 
     @action(detail=False,methods=['get'])
     def who_im(self,request):
-        user = request.user
-        return JsonResponse({
-            'id':user.id,
-            'is_superuser':user.is_superuser,
-            'username':user.username,
-            'first_name':user.first_name,
-            'last_name': user.last_name,
-            'email':user.email,
-            'is_staff':user.is_staff,
-            'is_active':user.is_active,
-            'is_staff':user.is_staff,
-            'date_joined':user.date_joined,
-            'location':user.location,
-            'birth_date':user.birth_date,
-            'avatar':user.avatar.url if user.avatar else None,      
-        })
+        user_dict = CustomUserSerializer(request.user)
+        return Response(user_dict.data)
+
     
     @action(detail=True, methods=['post'])
     def save_avatar_image(self, request, pk):

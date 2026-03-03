@@ -3,9 +3,9 @@ from tools.serializers import ModelSerializerId
 from rest_framework import serializers
 from userapp.models import CustomUser
 from userapp.serializers import CustomUserSerializer
+from rest_framework.serializers import BaseSerializer 
 
-    
-class CommentInlineSerializer(ModelSerializerId):
+class CommentBase(serializers.ModelSerializer):
     date= serializers.DateTimeField(
         format='%d.%m.%Y %H:%M',
         read_only=True,
@@ -22,24 +22,13 @@ class CommentInlineSerializer(ModelSerializerId):
         return obj.img_file.url if obj.img_file else None
     def get_data_url(self, obj):
         return obj.data.url if obj.data else None
-    
-class CommentSerializer(serializers.ModelSerializer):
-    date= serializers.DateTimeField(
-        format='%d.%m.%Y %H:%M',
-        read_only=True,
-    )
-    data_url = serializers.SerializerMethodField()
-    img_file_url = serializers.SerializerMethodField()
 
-    class Meta:
-        model = Comment
-        fields = "__all__"
+class CommentInlineSerializer(CommentBase, ModelSerializerId):
+    pass
 
-    def get_img_file_url(self, obj):
-        return obj.img_file.url if obj.img_file else None
-    def get_data_url(self, obj):
-        return obj.data.url if obj.data else None
-    
+class CommentSerializer(CommentBase, serializers.ModelSerializer):
+    pass
+
 class TaskInlineSerializer(ModelSerializerId):
     comment_set = CommentInlineSerializer(many=True, read_only=True)
     executor = CustomUserSerializer(many=True, read_only=True)

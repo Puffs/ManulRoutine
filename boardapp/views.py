@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import TemplateView
-from django_filters import FilterSet
+from django_filters import FilterSet, ModelMultipleChoiceFilter
 from rest_framework import viewsets
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter
@@ -9,7 +9,7 @@ from rest_framework.decorators import action
 from boardapp.serializers import BoardSerializer, ColumnSerializer
 from boardapp.models import Board, Column
 from django.http import JsonResponse
-from rest_framework.permissions import IsAuthenticated,DjangoModelPermissions
+from rest_framework.permissions import IsAuthenticated,DjangoModelPermissions, IsAuthenticatedOrReadOnly
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.db.models import Prefetch
@@ -26,7 +26,11 @@ class IndexView(LoginRequiredMixin,TemplateView):
 
 
 class BoardSetFilter(FilterSet):
-    
+
+    def filter_queryset(self, request):
+        user = self.request.user
+        return Board.objects.filter(user_list=user)
+
     class Meta:
         model = Board
         fields= '__all__'
@@ -127,7 +131,8 @@ class ColumnViewSet(viewsets.ModelViewSet):
 @receiver(post_save, sender=Board)
 def my_model_post_save(sender, instance, created, **kwargs):
     if created:
-        Column.objects.create(name="ToDo", order=0, board=instance)
-        Column.objects.create(name="In progress", order=1, board=instance)
-        Column.objects.create(name="Done", order=2, board=instance)
+        Column.objects.create(name="Backlog", order=0, board=instance)
+        Column.objects.create(name="ToDo", order=1, board=instance)
+        Column.objects.create(name="In progress", order=2, board=instance)
+        Column.objects.create(name="Done", order=3, board=instance)
     

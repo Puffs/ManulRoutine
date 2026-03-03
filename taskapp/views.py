@@ -6,8 +6,8 @@ from rest_framework.decorators import action
 from taskapp.serializers import TaskSerializer, CommentSerializer
 from taskapp.models import Task, Comment
 from django.http import JsonResponse
-from rest_framework.permissions import IsAuthenticated, DjangoModelPermissions
-
+from rest_framework.permissions import IsAuthenticated, DjangoModelPermissions, IsAuthenticatedOrReadOnly
+from rest_framework.response import Response
 
 class TaskSetFilter(FilterSet):
 
@@ -32,7 +32,7 @@ class TaskViewSet(viewsets.ModelViewSet):
             task_obj.save()
         
         return JsonResponse({}, safe=False)
-    
+
     @action(detail=True, methods=['post'])
     def save_input_img(self, request, pk):
         user = request.user

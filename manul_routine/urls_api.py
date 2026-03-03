@@ -14,4 +14,4 @@ router.register(r'task', taskapp_view.TaskViewSet, basename='task')
 router.register(r'comment', taskapp_view.CommentViewSet, basename='comment')
 router.register(r'user', userapp_view.CustomUserViewSet, basename='user')
 
-urlpatterns =[path('api/', include(router.urls))]
+urlpatterns = [path('api/', include(router.urls))]
