@@ -2,7 +2,7 @@ from taskapp.models import Task, Comment
 from tools.serializers import ModelSerializerId
 from rest_framework import serializers
 from userapp.models import CustomUser
-from userapp.serializers import CustomUserSerializer
+from userapp.serializers import CustomUserSerializer, CustomUserInlineSerializer
 from rest_framework.serializers import BaseSerializer 
 
 class CommentBase(serializers.ModelSerializer):
@@ -10,14 +10,14 @@ class CommentBase(serializers.ModelSerializer):
         format='%d.%m.%Y %H:%M',
         read_only=True,
     )
-    author = CustomUserSerializer(read_only=True)
+    author = CustomUserInlineSerializer()
     img_file_url = serializers.SerializerMethodField()
     data_url = serializers.SerializerMethodField()
 
     class Meta:
         model = Comment
         fields = "__all__"
-
+    
     def get_img_file_url(self, obj):
         return obj.img_file.url if obj.img_file else None
     def get_data_url(self, obj):

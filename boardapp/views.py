@@ -42,7 +42,7 @@ class BoardViewSet(viewsets.ModelViewSet):
     serializer_class = BoardSerializer
     filter_backends = (DjangoFilterBackend,OrderingFilter)
     filterset_class  = BoardSetFilter
-    permission_classes = [IsAuthenticated,DjangoModelPermissions]
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     @action(detail=True, methods=['post'])
     def remove_user(self, request, pk):
@@ -116,7 +116,7 @@ class ColumnViewSet(viewsets.ModelViewSet):
     serializer_class = ColumnSerializer
     filter_backends = (DjangoFilterBackend,OrderingFilter)
     filterset_class  = ColumnSetFilter
-    permission_classes = [IsAuthenticated,DjangoModelPermissions]
+    permission_classes = [IsAuthenticatedOrReadOnly]
     
     @action(detail=False, methods=['post'])
     def set_column_order(self, request):

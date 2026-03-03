@@ -14,9 +14,9 @@ class BoardInlineSerializer(ModelSerializerId):
 class BoardSerializer(serializers.ModelSerializer):
     background_image_url = serializers.SerializerMethodField()
 
-    def validate_name(self, value):
-        if len(value) < 4:
-            raise ValidationError("Название доски должно содержать 4 или более символов")
+    # def validate_name(self, value):
+    #     if len(value) < 4:
+    #         raise ValidationError("Название доски должно содержать 4 или более символов")
 
     class Meta:
         model = Board

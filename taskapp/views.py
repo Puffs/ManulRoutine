@@ -21,7 +21,7 @@ class TaskViewSet(viewsets.ModelViewSet):
     serializer_class = TaskSerializer
     filter_backends = (DjangoFilterBackend,OrderingFilter)
     filterset_class  = TaskSetFilter
-    permission_classes = [IsAuthenticated,DjangoModelPermissions]
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     @action(detail=False, methods=['post'])
     def set_task_order(self, request):
@@ -64,4 +64,4 @@ class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
     filter_backends = (DjangoFilterBackend,OrderingFilter)
     filterset_class  = CommentSetFilter
-    permission_classes = [IsAuthenticated,DjangoModelPermissions]
+    permission_classes = [IsAuthenticatedOrReadOnly]

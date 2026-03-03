@@ -9,7 +9,7 @@ from userapp.serializers import CustomUserSerializer
 from userapp.models import CustomUser
 from django.http import JsonResponse
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated,DjangoModelPermissions
+from rest_framework.permissions import IsAuthenticated,DjangoModelPermissions, IsAuthenticatedOrReadOnly
 from django import forms
 from django.shortcuts import render, redirect
 from django.core.exceptions import ValidationError
@@ -31,7 +31,7 @@ class CustomUserViewSet(viewsets.ModelViewSet):
     serializer_class = CustomUserSerializer
     filter_backends = (DjangoFilterBackend,OrderingFilter)
     filterset_class  = CustomUserSetFilter
-    permission_classes = [IsAuthenticated,DjangoModelPermissions]
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     @action(detail=False,methods=['get'])
     def who_im(self,request):
