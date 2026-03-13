@@ -18,6 +18,7 @@ from django.core.files.base import ContentFile
 import base64
 from userapp.models import CustomUser
 # from django.contrib.auth.decorators import login_required
+from django_filters import rest_framework as filters
 
 
 class IndexView(LoginRequiredMixin,TemplateView):
@@ -26,10 +27,11 @@ class IndexView(LoginRequiredMixin,TemplateView):
 
 
 class BoardSetFilter(FilterSet):
+    name = filters.CharFilter(method="get_name")
 
-    def filter_queryset(self, request):
-        user = self.request.user
-        return Board.objects.filter(user_list=user)
+    def get_name(self, queryset, name, value):
+        return queryset.filter(name__icontains=value)
+
 
     class Meta:
         model = Board
@@ -43,6 +45,12 @@ class BoardViewSet(viewsets.ModelViewSet):
     filter_backends = (DjangoFilterBackend,OrderingFilter)
     filterset_class  = BoardSetFilter
     permission_classes = [IsAuthenticatedOrReadOnly]
+    # search_fields = ['name']
+
+    def get_queryset(self):
+        user = self.request.user
+        queryset = Board.objects.filter(user_list=user)
+        return queryset
 
     @action(detail=True, methods=['post'])
     def remove_user(self, request, pk):
