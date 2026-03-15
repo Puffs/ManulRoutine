@@ -64,8 +64,8 @@ class BoardViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['post'])
     def add_user(self, request, pk):
         board_obj = Board.objects.get(id=pk)
-        user_id = request.data.get("user_id")
-        user_obj = CustomUser.objects.get(id=user_id)
+        user_email = request.data.get("email")
+        user_obj = CustomUser.objects.get(email=user_email)
         board_obj.user_list.add(user_obj)
         return JsonResponse(pk, safe=False)
     
